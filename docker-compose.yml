@@ -1,0 +1,36 @@
+name: guacamole
+
+services:
+  mysql:
+    image: mysql:latest
+    container_name: mysql
+    restart: unless-stopped
+    volumes:
+      - "./data:/var/lib/mysql"
+      - "./scripts:/docker-entrypoint-initdb.d/"
+    env_file:
+      - path: ./mysql.env
+        required: true
+    networks:
+      - guacamole-default
+  guacdapi:
+    image: guacamole/guacd
+    container_name: guacdapi
+    restart: unless-stopped
+    networks:
+      - guacamole-default
+  guacwebui:
+    image: guacamole/guacamole
+    container_name: guacwebui
+    restart: unless-stopped
+    env_file:
+      - path: ./guac.env
+        required: true
+    networks:
+      - guacamole-default
+    ports:
+      - 8080:8080
+
+networks:
+  guacamole-default:
+    external: true
